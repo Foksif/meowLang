@@ -1,6 +1,7 @@
 #include "parser.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void next(Parser *p) { p->current = lexer_next(&p->lexer); }
 
@@ -36,6 +37,8 @@ static const char *token_name(TokenType t) {
     return "/";
   case TOKEN_AT_APP:
     return "@app";
+  case TOKEN_INT:
+    return "int";
   default:
     return "unknown";
   }
@@ -58,6 +61,8 @@ void parser_init(Parser *p, const char *src) {
 // STATEMENTS
 
 Stmt *parse_statement(Parser *p) {
+
+  // return
   if (p->current.type == TOKEN_RETURN) {
     next(p);
 
@@ -69,6 +74,30 @@ Stmt *parse_statement(Parser *p) {
     return s;
   }
 
+  // int x = expr;
+  if (p->current.type == TOKEN_INT) {
+
+    next(p);
+
+    if (p->current.type != TOKEN_IDENTIFIER) {
+      printf("expected variable name after int\n");
+      exit(1);
+    }
+
+    Stmt *s = malloc(sizeof(Stmt));
+    s->type = STMT_VAR;
+
+    s->var_name = strdup(p->current.lexeme);
+    next(p); // съели имя переменной
+
+    expect(p, TOKEN_EQ);
+
+    s->var_value = parse_expression(p);
+
+    expect(p, TOKEN_SEMICOLON);
+
+    return s;
+  }
   printf("unknown statement\n");
   exit(1);
 }
@@ -86,7 +115,11 @@ FunctionNode parse_function(Parser *p) {
   expect(p, TOKEN_FUNC);
 
   fn.name = p->current.lexeme;
-  expect(p, TOKEN_IDENTIFIER);
+  if (p->current.type != TOKEN_IDENTIFIER && p->current.type != TOKEN_INT) {
+    printf("expected return type\n");
+    exit(1);
+  }
+  next(p);
 
   expect(p, TOKEN_LPAREN);
   expect(p, TOKEN_RPAREN);
@@ -114,12 +147,23 @@ FunctionNode parse_function(Parser *p) {
 // EXPRESSIONS
 
 Expr *parse_factor(Parser *p) {
-  Expr *e = malloc(sizeof(Expr));
 
   if (p->current.type == TOKEN_NUMBER) {
+    Expr *e = malloc(sizeof(Expr));
     e->type = EXPR_NUMBER;
     e->value = atoi(p->current.lexeme);
     e->left = e->right = NULL;
+    e->var_name = NULL;
+
+    next(p);
+    return e;
+  }
+
+  if (p->current.type == TOKEN_IDENTIFIER) {
+
+    Expr *e = malloc(sizeof(Expr));
+    e->type = EXPR_VAR;
+    e->var_name = strdup(p->current.lexeme);
 
     next(p);
     return e;

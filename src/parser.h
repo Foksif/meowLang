@@ -6,17 +6,17 @@
 
 typedef struct {
   Lexer lexer;
-  Token current;
+  Token current; // теперь Token уже известен через lexer.h → token.h
 } Parser;
 
 void parser_init(Parser *parser, const char *src);
 
-FunctionNode parse_function(Parser *parser);
+Stmt *parse_statement(Parser *parser);
 
 Expr *parse_expression(Parser *parser);
 Expr *parse_term(Parser *parser);
 Expr *parse_factor(Parser *parser);
 
-Stmt *parse_statement(Parser *parser);
+FunctionNode parse_function(Parser *parser);
 
 #endif

@@ -8,6 +8,8 @@ typedef enum {
   TOKEN_FUNC,
   TOKEN_RETURN,
 
+  TOKEN_INT,
+
   TOKEN_IDENTIFIER,
   TOKEN_NUMBER,
 
@@ -22,7 +24,8 @@ typedef enum {
   TOKEN_PLUS,
   TOKEN_MINUS,
   TOKEN_STAR,
-  TOKEN_SLASH
+  TOKEN_SLASH,
+  TOKEN_EQ
 } TokenType;
 
 typedef struct {

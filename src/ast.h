@@ -1,36 +1,38 @@
 #ifndef AST_H
 #define AST_H
 
-// EXPRESSIONS
-
-typedef enum { EXPR_NUMBER, EXPR_BINARY } ExprType;
+typedef enum { EXPR_NUMBER, EXPR_BINARY, EXPR_VAR } ExprType;
 
 typedef struct Expr Expr;
 
 struct Expr {
   ExprType type;
 
-  int value; // number
+  int value;
 
-  char op; // + - * /
+  char op;
 
   Expr *left;
   Expr *right;
+
+  char *var_name; // ONLY FOR EXPR_VAR
 };
 
 // STATEMENTS
-
-typedef enum { STMT_RETURN } StmtType;
+typedef enum { STMT_RETURN, STMT_VAR } StmtType;
 
 typedef struct Stmt Stmt;
 
 struct Stmt {
   StmtType type;
-  Expr *expr;
+
+  Expr *expr; // return
+
+  char *var_name; // var decl
+  Expr *var_value;
 };
 
 // FUNCTION
-
 typedef struct {
   char *name;
 

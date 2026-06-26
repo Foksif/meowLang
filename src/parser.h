@@ -10,6 +10,13 @@ typedef struct {
 } Parser;
 
 void parser_init(Parser *parser, const char *src);
+
 FunctionNode parse_function(Parser *parser);
+
+Expr *parse_expression(Parser *parser);
+Expr *parse_term(Parser *parser);
+Expr *parse_factor(Parser *parser);
+
+Stmt *parse_statement(Parser *parser);
 
 #endif
